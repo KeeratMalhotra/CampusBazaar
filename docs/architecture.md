@@ -46,10 +46,10 @@ Browser ──► Vite dev server (localhost:5173)
 | Backend | Python + FastAPI | Your first language; typed request validation; built-in WebSockets; automatic API docs | Spring Boot (slow cold starts), Express (no structure), Django (built for server-rendered pages) |
 | Database | PostgreSQL | Our data is relational; full-text search is built in | MongoDB (a poor fit for relational data) |
 | DB access | SQLAlchemy 2.0 + Alembic | The standard Python ORM; Alembic migrations track every schema change, like git does for code | Raw SQL strings everywhere; SQLModel (simpler, but hides how SQLAlchemy works) |
-| Frontend hosting | Vercel (Hobby plan) | Free, deploys straight from GitHub, can forward our API calls | Netlify, Cloudflare Pages |
-| Backend hosting | Google Cloud Run | Runs our Docker container, scales to zero when idle, generous free tier | A virtual machine (we'd have to manage the server ourselves) |
+| Frontend hosting | Vercel (Hobby plan) | Free, deploys straight from GitHub, can forward our API calls | Netlify, Cloudflare Pages; GitHub Pages (can't forward API calls, and needs a paid plan for private repos) |
+| Backend hosting | Google Cloud Run | Runs our Docker container, wakes up in seconds, 1 full CPU, scales to zero when idle | Render's free plan (about a minute to wake up after 15 idle minutes, 0.1 CPU, email ports blocked); a virtual machine (we'd manage the server ourselves); GitHub (can't run a backend) |
 | Database hosting | Neon (Free plan) | Free Postgres that doesn't expire; no card needed | Supabase (bundles auth and storage, which we want to build ourselves) |
-| Files | Cloudflare R2 | Downloads (egress) are free; it uses the S3 API, the most common storage API | Google Cloud Storage (free tier only in US regions, and downloads are charged) |
+| Files | Cloudflare R2 | 10 GB free, downloads always free, can be stored in Asia-Pacific; uses the S3 API, the most common storage API | Google Cloud Storage (smaller free tier, and only in US regions, far from India) |
 | Email | Gmail SMTP with an app password | Free, and works without owning a domain | Resend or Brevo (both need a domain you own) |
 | AI | Gemini API | Has a free tier; can be forced to answer in exact JSON | |
 | Local database | Postgres in Docker | Same database as production; reset it in seconds | Installing Postgres directly on Windows |
@@ -90,6 +90,7 @@ A `User` row has an email. The `UserPublic` schema that other students receive h
 
 ### 6. Files: private buckets and signed links
 
+- **Why a separate storage service at all?** Cloud Run's disk is wiped every time the server stops, which happens whenever it scales to zero and on every deploy. Putting files in the database doesn't work either: a few hundred photos would fill Neon's 1 GB, and every download would keep the backend busy. So files go in object storage, a service built just for storing and serving files.
 - Each environment (development, production) has one private R2 bucket. Nothing is public. To show a file, the backend creates a **signed URL**, a link that only works for a limited time.
 - **Why not a public bucket?** R2's free public address (`r2.dev`) is rate-limited and not meant for production ([R2 limits](https://docs.cloudflare.com/r2/platform/limits/)). The proper fix needs a custom domain. Signed links work without one, and we need them anyway for private PDFs.
 - **Photos** go through the backend. Pillow checks that they're real images, strips their metadata, resizes them and saves them as WebP. Phone photos often carry GPS coordinates, which could reveal your hostel room and break anonymity. The browser shrinks photos before uploading, so uploads stay small on hostel Wi-Fi.
@@ -202,7 +203,7 @@ CampusBazaar/
 6. Upload limits per student, so storage stays inside R2's 10 GB.
 7. Old Docker images deleted automatically.
 
-**Honest summary:** development, demos and a small beta stay free. If hundreds of students use the app daily, the free tiers stop being enough. For example, a server that's busy 10 hours a day goes about 250 hours past the Cloud Run free tier, which is roughly $25 or more a month. Chat is the main cost. Module 10.5 shows the fix: hand live delivery to a managed real-time service's free tier.
+**Honest summary:** development, demos and a small beta stay free. If hundreds of students use the app daily, the free tiers stop being enough. For example, a server that's busy 10 hours a day goes about 250 hours past the Cloud Run free tier, which is roughly $25 or more a month. Chat is the main cost. Module 10.5 shows the fixes: hand live delivery to a managed real-time service, or run just the chat part on a host that bills by the hour instead of by the busy second, such as Render.
 
 ## Security and privacy checklist
 
