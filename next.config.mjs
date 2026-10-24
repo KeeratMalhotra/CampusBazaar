@@ -9,6 +9,11 @@ const nextConfig = {
       },
     },
   },
+  // photos are already shrunk in the browser before upload,
+  // so we skip next's image optimizer (and its free-plan limits)
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;

@@ -1,6 +1,7 @@
 import { Bricolage_Grotesque, Space_Grotesk, Space_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileNav from "@/components/MobileNav";
 import "./globals.css";
 
 // headings
@@ -34,10 +35,12 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${bricolage.variable} ${spaceGrotesk.variable} ${spaceMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-sans">
+      {/* pb-24 leaves room for the phone tab bar */}
+      <body className="flex min-h-full flex-col pb-24 font-sans sm:pb-0">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <MobileNav />
       </body>
     </html>
   );

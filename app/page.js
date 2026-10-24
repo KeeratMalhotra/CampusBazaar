@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import HeroCollage from "@/components/HeroCollage";
 import Marquee from "@/components/Marquee";
+import ListingCard from "@/components/ListingCard";
+import { createClient } from "@/lib/supabase/server";
 
 const categories = [
   { slug: "notes", name: "notes", line: "handwritten > printed. no debate.", icon: NotebookPen, color: "bg-sun" },
@@ -53,7 +55,16 @@ const safety = [
   { icon: Flag, title: "report in one tap", text: "something feels off? report it and it goes straight to the mods." },
 ];
 
-export default function Home() {
+export default async function Home() {
+  // newest 4 live listings for the "fresh drops" row
+  const supabase = await createClient();
+  const { data: fresh } = await supabase
+    .from("listings")
+    .select("id, title, price, category, type, condition, images, status, created_at, seller:profiles(username)")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(4);
+
   return (
     <>
       {/* ---------- hero ---------- */}
@@ -98,6 +109,25 @@ export default function Home() {
       </section>
 
       <Marquee />
+
+      {/* ---------- fresh drops (only shows once people have posted) ---------- */}
+      {fresh?.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pt-20">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+              fresh drops <span className="inline-block -rotate-12">🔥</span>
+            </h2>
+            <Link href="/browse" className="font-bold underline decoration-pink decoration-[3px] underline-offset-4">
+              see all
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {fresh.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ---------- categories ---------- */}
       <section className="mx-auto max-w-6xl px-4 py-20">
