@@ -5,6 +5,9 @@ import { moderate, loadListingImages } from "@/lib/gemini";
 import { cleanListingInput, listingText, statusFromVerdict } from "@/lib/listing-input";
 import { MAX_ACTIVE_LISTINGS } from "@/lib/constants";
 
+// the ai check can take a few seconds, so give this route up to 60s on vercel
+export const maxDuration = 60;
+
 // POST /api/listings -> create a listing, then let the ai check it
 export async function POST(request) {
   const { supabase, userId } = await getUser();

@@ -4,6 +4,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { moderate, loadListingImages } from "@/lib/gemini";
 import { cleanListingInput, listingText, statusFromVerdict } from "@/lib/listing-input";
 
+// the ai check can take a few seconds, so give this route up to 60s on vercel
+export const maxDuration = 60;
+
 // PUT /api/listings/:id -> edit your listing. edits get checked by the ai again.
 export async function PUT(request, { params }) {
   const { id } = await params;
