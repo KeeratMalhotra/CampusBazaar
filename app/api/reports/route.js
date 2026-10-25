@@ -5,6 +5,9 @@ import { moderate, loadListingImages } from "@/lib/gemini";
 import { listingText } from "@/lib/listing-input";
 import { REPORT_REASONS, MAX_REPORTS_PER_DAY } from "@/lib/constants";
 
+// the ai check can take a few seconds, so give this route up to 60s on vercel
+export const maxDuration = 60;
+
 // POST /api/reports -> a student reports a listing or a chat message.
 // gemini gives a first opinion so mods see the worst stuff first.
 // the ai never bans anyone. it can only hide a listing until a human looks at it.
