@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/* ---------- colors, fonts, shadows ---------- */
+@theme {
+  --color-ink: #0e0e10;
+  --color-paper: #fff8ec;
+  --color-lime: #c4f251;
+  --color-pink: #ff8cc6;
+  --color-grape: #a594ff;
+  --color-sun: #ffd447;
+  --color-sky: #86d8ff;
+  --color-tangerine: #ff9a5c;
+
+  --shadow-brutal-sm: 2px 2px 0 0 #0e0e10;
+  --shadow-brutal: 4px 4px 0 0 #0e0e10;
+  --shadow-brutal-lg: 7px 7px 0 0 #0e0e10;
+
+  --animate-floaty: floaty 6s ease-in-out infinite;
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-spin-slow: spin 14s linear infinite;
+  --animate-blink: blink 1.2s steps(1) infinite;
+}
+
+/* fonts come from next/font in layout.js */
+@theme inline {
+  --font-display: var(--font-bricolage);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-space-mono);
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- base ---------- */
+body {
+  background-color: var(--color-paper);
+  /* tiny dot grid, like a notebook */
+  background-image: radial-gradient(rgb(14 14 16 / 0.13) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-lime);
+}
+
+/* ---------- reusable bits ---------- */
+/* inside @layer components so tailwind classes like bg-lime can still override them */
+@layer components {
+  /* chunky bordered card */
+  .card {
+    border: 2.5px solid var(--color-ink);
+    border-radius: 18px;
+    background: white;
+    box-shadow: var(--shadow-brutal);
+  }
+
+  /* buttons: the shadow "squishes" when you press them */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2.5px solid var(--color-ink);
+    border-radius: 999px;
+    padding: 0.7rem 1.35rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: var(--shadow-brutal);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+
+  .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+
+  .btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 0 var(--color-ink);
+  }
+
+  /* little label stickers like "NOTES" or "₹150" */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  /* highlighter-pen effect behind a word */
+  .marker {
+    display: inline-block;
+    padding: 0 0.18em;
+    border: 2.5px solid var(--color-ink);
+    border-radius: 12px;
+    box-shadow: var(--shadow-brutal);
+  }
+}
+
+/* people who turned off animations in their phone settings */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
